@@ -1,6 +1,6 @@
-import os
 from pathlib import Path
 from decouple import config
+from django_bolt import FileSize
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,20 +9,18 @@ DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
+    "django_bolt",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
-    "corsheaders",
     "storages",
     "cvmanager",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -96,5 +94,4 @@ STORAGES = {
 }
 
 # Límite de tamaño de archivos (10 MB)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+BOLT_MAX_UPLOAD_SIZE = FileSize.MB_10

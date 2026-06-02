@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ('last_name', models.CharField(max_length=100)),
                 ('email', models.EmailField(max_length=254)),
                 ('country', models.CharField(max_length=100)),
+                ('url', models.URLField(blank=True, max_length=500, verbose_name='Web / LinkedIn')),
                 ('cv_file', models.FileField(upload_to='cvs/')),
                 ('uploaded_at', models.DateTimeField(auto_now_add=True)),
             ],

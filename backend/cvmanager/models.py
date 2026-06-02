@@ -1,11 +1,11 @@
 from django.db import models
 
-
 class CV(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     country = models.CharField(max_length=100)
+    url = models.URLField(max_length=500, blank=True, verbose_name="Sitio web / LinkedIn")
     cv_file = models.FileField(upload_to="cvs/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,52 +1,54 @@
-# UCV — Upload Curriculum Vitae
+# OnMind-UCV — Upload Curriculum Vitae
 
-Aplicación para cargar currículum vitae (CV) mediante un formulario web.  
-Frontend en **React + Vite**, backend en **Django REST Framework**, almacenamiento de archivos en **bucket S3** (**RustFS** o **Floci** en local) y base de datos **SQLite**.
+Application to upload curriculum vitae (CV) through a web form.  
+Frontend in **React + Vite**, backend in **Django + [Django-Bolt](https://onmind.net/code/es/Django)**, file storage in **S3 bucket** (**RustFS** or **Floci** locally) and **SQLite** database.
 
-## Estructura del proyecto
+## Project structure
 
 ```
-ucv/
-├── backend/                          # Django REST API
+  ______
+./ ucv /
+│
+├── backend/                          # Django API (Django-Bolt)
 │   ├── cvmanager/
-│   │   ├── models.py                 # Modelo CV (firstName, lastName, email, country, cv_file)
-│   │   ├── serializers.py            # Validación (solo PDF, ≤10 MB)
-│   │   ├── views.py                  # POST /api/upload/ → 201 + mensaje
-│   │   ├── urls.py                   # Ruta del endpoint
-│   │   ├── admin.py                  # Registro en admin de Django
+│   │   ├── api.py                    # POST /api/upload + GET /api/cv-files endpoints (Django-Bolt)
+│   │   ├── models.py                 # CV model (firstName, lastName, email, country, url, cv_file)
+│   │   ├── admin.py                  # Django admin registration
 │   │   └── apps.py
 │   ├── ucv/
-│   │   ├── settings.py               # Configuración global (S3, CORS, SQLite, DRF)
-│   │   ├── urls.py                   # Rutas raíz
+│   │   ├── settings.py               # Global config (S3, CORS, Django-Bolt)
+│   │   ├── urls.py                   # Root routes (admin)
 │   │   └── wsgi.py
 │   ├── manage.py
 │   ├── requirements.txt
-│   └── .env.example                  # Variables de entorno (S3, secrets)
+│   └── .env.example                  # Environment variables (S3, secrets)
 │
 ├── frontend/                         # React + Vite
 │   ├── src/
-│   │   ├── App.jsx                   # Formulario con validación y notificaciones
-│   │   ├── App.css                   # Estilos del formulario
-│   │   ├── index.css                 # Estilos globales
-│   │   └── main.jsx                  # Punto de entrada
+│   │   ├── App.jsx                   # Form with validation and notifications
+│   │   ├── App.css                   # Form styles
+│   │   ├── index.css                 # Global styles
+│   │   └── main.jsx                  # Entry point
 │   ├── index.html
-│   ├── vite.config.js                # Proxy /api → Django
+│   ├── vite.config.js                # Proxy /api -> Django
 │   └── package.json
 │
-├── storage/                          # Folder to store CV files (.pdf)
+├── storage/                          # Folder to upload CV files (.pdf)
 │
 └── README.md
 ```
 
-## Requisitos
+> Logic is centralized in `cvmanager/api.py` using [**Django-Bolt**](https://onmind.net/code/es/Django), an API framework powered by **Rust** (which replaces **Django REST Framework**).
+
+## Prerequisites
 
 - **Python** 3.10+
 - **Bun**
-- Un servicio S3-compatible (Floci, RustFS, MinIO, AWS S3, etc.)
+- An S3-compatible service (RustFS, Floci, MinIO, AWS S3, etc.)
 
-## Inicio rápido
+## Getting Started
 
-Para inciar el servicio, se abre la carpeta `backend` y se ejecutan las sentencias para preparar el entorno virtual de **Python** y proyecto de **Django**. De modo semejante ocurre con el `frontend`, abriendo una terminal o sesión adicional.
+To start the service, open the `backend` folder and run the commands to set up the **Python** virtual environment and **Django** project. Similarly, open an additional terminal for the `frontend`.
 
 ### 1. Backend
 
@@ -57,11 +59,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate
-python manage.py runserver
+python manage.py runbolt --dev
 ```
 
-> Recuerda editar `.env` con las credenciales **S3** correspondientes.  
-> El backend queda disponible en `http://localhost:8000`.
+> Service available at `http://localhost:8000`. **OpenAPI** docs at `http://localhost:8000/docs`.
+> Remember to edit `.env` with the corresponding **S3** credentials.
 
 ### 2. Frontend
 
@@ -71,52 +73,54 @@ bun install
 bun run dev
 ```
 
-> El frontend se abre en `http://localhost:5173`.  
-> El proxy de **Vite** redirige las peticiones `/api/*` al backend en `:8000`.
+> The frontend opens at `http://localhost:5173`.  
+> **Vite** proxy redirects `/api/*` requests to the backend on `:8000`.
 
-## Uso
+## Usage
 
-1. Abrir `http://localhost:5173`
-2. Completar: nombre, apellido, email, país (selector) y adjuntar CV (PDF)
-3. Hacer clic en **Enviar**
-4. Si es exitoso: notificación verde y el formulario se deshabilita
-5. Si hay error: notificación roja con el detalle
+1. Open `http://localhost:5173`
+2. Fill in: first name, last name, email, country (selector) and attach CV (PDF)
+3. Click **Submit**
+4. On success: green notification and the form is disabled
+5. On error: red notification with details
 
-## Endpoint API
+## API Endpoints
 
-| Método | Ruta             | Descripción                     |
+| Method | Route            | Description                      |
 |--------|------------------|----------------------------------|
-| POST   | `/api/upload/`   | Sube un CV (multipart/form-data) |
+| POST   | `/api/upload`    | Upload a CV (multipart/form-data) |
+| GET    | `/api/cv-files`  | List CVs                         |
 
-### Campos del POST
+### POST endpoint fields
 
-| Campo       | Tipo     | Descripción                |
-|-------------|----------|----------------------------|
-| first_name  | string   | Nombre                     |
-| last_name   | string   | Apellido                   |
-| email       | string   | Correo electrónico         |
-| country     | string   | País                       |
-| cv_file     | file     | Archivo PDF (máx. 10 MB)   |
+| Field      | Type   | Description                |
+|------------|--------|----------------------------|
+| first_name | string | First name                 |
+| last_name  | string | Last name                  |
+| email      | string | Email address              |
+| country    | string | Country                    |
+| url        | string | Website or LinkedIn URL    |
+| cv_file    | file   | PDF file (max 10 MB)       |
 
-## Almacenamiento S3
+## S3 Storage
 
-Los archivos se guardan en un recipiente (bucket) S3 configurable vía variables de entorno.  
-Si has instalado el binario de **RustFS**, puedes lanzar el servicio ejecutando:
+Files are stored in a configurable S3 bucket via environment variables.  
+If you have the **RustFS** binary installed, you can start the service by running:
 
 ```bash
 rustfs server --address :9000 ./storage
 ```
 
-> Se el volumen, por ejemplo, carpeta `storage`. El puerto apunta a `http://localhost:9000`.  
+> Use a volume, e.g., `storage` folder. The port points to `http://localhost:9000`.
 
-Recuerda crear el recipiente (bucket) antes de usar. Por ejemplo, usando la **API** de **RustFS**:
+Remember to create the bucket before using it. For example, using the **RustFS** **API**:
 
 ```bash
-curl --location --request PUT 'http://localhost:9000/ubv-bucket' \
+curl --location --request PUT 'http://localhost:9000/ucv-bucket' \
 --header 'X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' \
 --header 'X-Amz-Date: 20250801T023519Z' \
 --header 'Authorization: AWS4-HMAC-SHA256 Credential=H4xcBZKQfvJjEnk3zp1N/20250801/cn-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c2fb2ba5199a30ebcfa9976d0f35000ba274da3701327957e84ea0f3920288f2'
 ```
 
-> La **API** se obtiene con la consola web (UI) de **RustFS** desde contenedor.  
-> También se puede crear el recipiente (bucket) desde de allí.
+> The **API** credentials can be obtained from the web UI (console) of [**RustFS**](https://onmind.net/devops/es/RustFS) from the container.  
+> You can also create the bucket from there.

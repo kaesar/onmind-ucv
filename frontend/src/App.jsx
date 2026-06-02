@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 const COUNTRIES = [
-  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia",
+  "Argentina", "Bolivia", "Brasil", "Canada", "Chile", "Colombia",
   "Costa Rica", "Cuba", "Ecuador", "El Salvador", "España",
   "Estados Unidos", "Guatemala", "Honduras", "México",
   "Nicaragua", "Panamá", "Paraguay", "Perú",
@@ -16,6 +16,7 @@ function App() {
     lastName: "",
     email: "",
     country: "",
+    url: "",
     cvFile: null,
   });
   const [errors, setErrors] = useState({});
@@ -68,6 +69,7 @@ function App() {
     formData.append("last_name", form.lastName.trim());
     formData.append("email", form.email.trim());
     formData.append("country", form.country);
+    formData.append("url", form.url);
     formData.append("cv_file", form.cvFile);
 
     try {
@@ -100,7 +102,7 @@ function App() {
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="form-group">
-          <label htmlFor="firstName">Nombre</label>
+          <label htmlFor="firstName">Nombre(s) *</label>
           <input
             id="firstName"
             name="firstName"
@@ -117,7 +119,7 @@ function App() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="lastName">Apellido</label>
+          <label htmlFor="lastName">Apellido(s) *</label>
           <input
             id="lastName"
             name="lastName"
@@ -134,7 +136,7 @@ function App() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Email *</label>
           <input
             id="email"
             name="email"
@@ -151,7 +153,7 @@ function App() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="country">País</label>
+          <label htmlFor="country">País *</label>
           <select
             id="country"
             name="country"
@@ -173,7 +175,20 @@ function App() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="cvFile">CV (PDF)</label>
+          <label htmlFor="url">Sitio web / LinkedIn</label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            value={form.url}
+            onChange={handleChange}
+            disabled={submitted}
+            placeholder="https://linkedin.com/in/tu-perfil"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="cvFile">CV (PDF) *</label>
           <input
             id="cvFile"
             name="cvFile"
