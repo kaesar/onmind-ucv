@@ -141,3 +141,42 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Database
+*.sqlite3
+*.sqlite
+
+# Django
+*.mo
+*.po
+
+# Frontend (Bun)
+bun.lock*
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Storage (MinIO)
+storage/
+
+# OS
+.DS_Store
+Thumbs.db
